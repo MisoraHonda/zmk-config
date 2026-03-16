@@ -6,6 +6,4 @@ requires:
   - nice_nano_v2
 features:
   - keys
-siblings:
-  - clear_orange_right
-  - clear_orange_left
+
