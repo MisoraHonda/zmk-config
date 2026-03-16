@@ -3,7 +3,7 @@ id: clear_orange
 name: clear_orange
 type: shield
 requires: 
-  - nice_nano_v2
+  - pro_micro
 features:
   - keys
 siblings:
