@@ -2,7 +2,8 @@ file_format: "1"
 id: clear_orange
 name: clear_orange
 type: shield
-requires: [pro_micro]
+requires: 
+　- nice_nano_v2
 features:
   - keys
 siblings:
