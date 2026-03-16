@@ -1,10 +1,10 @@
 file_format: "1"
-id: clearorange
+id: clear_orange
 name: clear_orange
 type: shield
 requires: [pro_micro]
 features:
   - keys
 siblings:
-  -clear_orange_right
-  -clear_orange_left
+  - clear_orange_right
+  - clear_orange_left
