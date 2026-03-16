@@ -5,8 +5,6 @@ jobs:
   build:
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
     with:
-      build_matrix: |
-        - board: nice_nano_v2
-          shield: clear_orange_left
-        - board: nice_nano_v2
-          shield: mykbd_right
+      build_args: >
+        -DSHIELD=clear_orange_left -DBOARD=nice_nano_v2
+        -DSHIELD=clear_orange_right -DBOARD=nice_nano_v2
