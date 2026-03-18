@@ -11,26 +11,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: West Init
-        run: west init -m https://github.com/zmkfirmware/zmk --mr main
-
-      - name: West Update
-        run: west update
-
-      - name: West Zephyr export
-        run: west zephyr-export
-
-      - name: Force Fix Directory and Build
+      - name: West Init and Update
         run: |
-          # 1. 無限ループの元になるファイルを物理的に排除
+          # 1. 既存の west 設定があれば削除してクリーンにする
+          rm -rf .west
+          # 2. あなたの config/west.yml を使って初期化
+          west init -l config
+          # 3. ZMK 本体などをダウンロード
+          west update
+          west zephyr-export
+
+      - name: Force Fix and Build
+        run: |
+          # 1. 無限ループの元になるルートのファイルを掃除
           rm -f build.yaml west.yml 2>/dev/null || true
           
-          # 2. ZMK本体の定義ディレクトリに、あなたのシールドファイルを直接流し込む
-          # これにより、外部モジュール設定を使わずに「標準シールド」として認識させます
+          # 2. シールドファイルを ZMK 本体側のディレクトリに直接コピー（認識を確実にする）
           mkdir -p zmk/app/boards/shields/clear_orange
           cp -r boards/shields/clear_orange/* zmk/app/boards/shields/clear_orange/
           
-          # 3. 余計な引数をすべて捨てて、本体のビルドとして実行
+          # 3. ビルド実行
           west build -s zmk/app -b nice_nano_v2 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right
