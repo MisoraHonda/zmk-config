@@ -37,7 +37,8 @@ jobs:
           west build -s zmk/app -b nice_nano_v2 -- \
           -DSHIELD=clear_orange_right \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}"
+          -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}" \
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk/app"
       - name: Rename zmk.uf2
         run: cp build/zephyr/zmk.uf2 clear_orange_right_nice_nano_v2.uf2
       - name: Archive artifacts
