@@ -1,10 +1,17 @@
-# Default config for Clear Orange Shield
+if SHIELD_CLEAR_ORANGE_LEFT
 
-CONFIG_SHIELD_CLEAR_ORANGE=y
+# Name must be less than 16 characters long!
+config ZMK_KEYBOARD_NAME
+    default "clear_orange"
 
-# 左右どちらかを選択
-CONFIG_SHIELD_CLEAR_ORANGE_LEFT=n
-CONFIG_SHIELD_CLEAR_ORANGE_RIGHT=y
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
 
-# 必要に応じてボード互換性の設定
-CONFIG_ZMK_BOARD_COMPAT=y
+endif
+
+if SHIELD_CLEAR_ORANGE_LEFT || SHIELD_CLEAR_ORANGE_RIGHT
+
+config ZMK_SPLIT
+    default y
+
+endif
