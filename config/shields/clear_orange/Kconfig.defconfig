@@ -1,0 +1,10 @@
+# Default config for Clear Orange Shield
+
+CONFIG_SHIELD_CLEAR_ORANGE=y
+
+# 左右どちらかを選択
+CONFIG_SHIELD_CLEAR_ORANGE_LEFT=n
+CONFIG_SHIELD_CLEAR_ORANGE_RIGHT=y
+
+# 必要に応じてボード互換性の設定
+CONFIG_ZMK_BOARD_COMPAT=y
