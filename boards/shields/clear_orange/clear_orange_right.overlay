@@ -4,32 +4,44 @@
 #include <dt-bindings/zmk/keys.h>
 
 / {
-    // 1. ZMKに「kscan0を使う」と教える設定を追加
     chosen {
         zmk,kscan = &kscan0;
-    };
+    }
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
-        // label = "KSCAN"; // なくても良いですが、あると丁寧です
-
         diode-direction = "row2col";
 
         row-gpios
-            = <&gpio0 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&gpio0 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&gpio0 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-            , <&gpio0 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            = <&gpio0 22 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // PIN 7 (P0.22)
+            , <&gpio0 24 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // PIN 8 (P0.24)
+            , <&gpio1 0  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // PIN 9 (P1.00)
+            , <&gpio0 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // PIN 10 (P0.11)
             ;
 
         col-gpios
-            = <&gpio0 20 GPIO_ACTIVE_HIGH>
-            , <&gpio0 19 GPIO_ACTIVE_HIGH>
-            , <&gpio0 18 GPIO_ACTIVE_HIGH>
-            , <&gpio0 17 GPIO_ACTIVE_HIGH>
-            , <&gpio0 16 GPIO_ACTIVE_HIGH>
-            , <&gpio0 15 GPIO_ACTIVE_HIGH>
-            , <&gpio0 14 GPIO_ACTIVE_HIGH>
+            = <&gpio0 31 GPIO_ACTIVE_HIGH> // PIN 20 (P0.31)
+            , <&gpio0 29 GPIO_ACTIVE_HIGH> // PIN 19 (P0.29)
+            , <&gpio0 2  GPIO_ACTIVE_HIGH> // PIN 18 (P0.02)
+            , <&gpio1 15 GPIO_ACTIVE_HIGH> // PIN 17 (P1.15)
+            , <&gpio1 13 GPIO_ACTIVE_HIGH> // PIN 16 (P1.13)
+            , <&gpio1 11 GPIO_ACTIVE_HIGH> // PIN 15 (P1.11)
+            , <&gpio0 10 GPIO_ACTIVE_HIGH> // PIN 14 (P0.10)
             ;
+    };
+
+    /* --- ここからトラックボール(MX8650A)の定義 --- */
+    /* 回路図の11番(P1.04)と12番(P1.06)を使用 */
+    trackball_bus: trackball_bus {
+        compatible = "zmk,input-sensor-pmw3610"; // MX8650Aと互換性のあるドライバ
+        status = "okay";
+        
+        // 回路図 PIN 12 = P1.06 (SCLK)
+        sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+        // 回路図 PIN 11 = P1.04 (SDIO)
+        sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+        
+        // 解像度の設定（お好みで調整してください）
+        cpi = <800>;
     };
 };
