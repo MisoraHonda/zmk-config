@@ -34,11 +34,11 @@ jobs:
         run: west zephyr-export
       - name: West Build (Right)
         run: |
-          west build -s zmk/app -b nice_nano_v2 -- \
+          west build -b nice_nano_v2 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}" \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk" \
-          -DSHIELD=clear_orange_right
+          -DSHIELD=clear_orange_right \
+          -S zmk/app
       - name: Rename zmk.uf2
         run: cp build/zephyr/zmk.uf2 clear_orange_right_nice_nano_v2.uf2
       - name: Archive artifacts
