@@ -36,10 +36,8 @@ jobs:
         run: west zephyr-export
 
       - name: West Build (Right)
-        # -DZMK_EXTRA_MODULES の指定を "${GITHUB_WORKSPACE}" から
-        # "${GITHUB_WORKSPACE}/boards" に変更して、ルートの余計なファイルを読み込ませないようにします。
         run: |
           west build -s zmk/app -b nice_nano_v2 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-          -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/boards" \
-          -DSHIELD=clear_orange_right
+          -DSHIELD=clear_orange_right \
+          -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}"
