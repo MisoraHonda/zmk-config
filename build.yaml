@@ -20,4 +20,4 @@
 ---
 include:
   - board: nice_nano_v2
-    shield: clear_orange_right
+    shield: clear_orange
