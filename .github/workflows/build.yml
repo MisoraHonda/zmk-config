@@ -27,13 +27,17 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: West Init
-        run: west init -l config
+        run: west init -l config/
       - name: West Update
         run: west update
       - name: West Zephyr export
         run: west zephyr-export
       - name: West Build (Right)
-        run: west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=clear_orange_right -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}"
+        run: |
+          west build -s zmk/app -b nice_nano_v2 -- \
+          -DSHIELD=clear_orange_right \
+          -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}"
       - name: Rename zmk.uf2
         run: cp build/zephyr/zmk.uf2 clear_orange_right_nice_nano_v2.uf2
       - name: Archive artifacts
