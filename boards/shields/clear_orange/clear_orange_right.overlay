@@ -1,22 +1,35 @@
+#include <dt-bindings/zmk/matrix_transform.h>
+#include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/keys.h>
+
 / {
+    // 1. ZMKに「kscan0を使う」と教える設定を追加
+    chosen {
+        zmk,kscan = &kscan0;
+    };
+
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
+        // label = "KSCAN"; // なくても良いですが、あると丁寧です
 
         diode-direction = "row2col";
 
-        row-gpios =
-            <&gpio0 7 GPIO_ACTIVE_HIGH>,
-            <&gpio0 8 GPIO_ACTIVE_HIGH>,
-            <&gpio0 9 GPIO_ACTIVE_HIGH>,
-            <&gpio0 10 GPIO_ACTIVE_HIGH>;
+        row-gpios
+            = <&gpio0 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio0 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio0 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            , <&gpio0 10 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+            ;
 
-        col-gpios =
-            <&gpio0 20 GPIO_ACTIVE_HIGH>,
-            <&gpio0 19 GPIO_ACTIVE_HIGH>,
-            <&gpio0 18 GPIO_ACTIVE_HIGH>,
-            <&gpio0 17 GPIO_ACTIVE_HIGH>,
-            <&gpio0 16 GPIO_ACTIVE_HIGH>,
-            <&gpio0 15 GPIO_ACTIVE_HIGH>,
-            <&gpio0 14 GPIO_ACTIVE_HIGH>;
+        col-gpios
+            = <&gpio0 20 GPIO_ACTIVE_HIGH>
+            , <&gpio0 19 GPIO_ACTIVE_HIGH>
+            , <&gpio0 18 GPIO_ACTIVE_HIGH>
+            , <&gpio0 17 GPIO_ACTIVE_HIGH>
+            , <&gpio0 16 GPIO_ACTIVE_HIGH>
+            , <&gpio0 15 GPIO_ACTIVE_HIGH>
+            , <&gpio0 14 GPIO_ACTIVE_HIGH>
+            ;
     };
 };
