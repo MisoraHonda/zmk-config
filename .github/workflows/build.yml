@@ -13,30 +13,35 @@ jobs:
 
       - name: West Init and Update
         run: |
-          # 1. 既存の west 設定があれば削除してクリーンにする
           rm -rf .west
-          # 2. あなたの config/west.yml を使って初期化
           west init -l config
-          # 3. ZMK 本体などをダウンロード
           west update
           west zephyr-export
 
-      - name: Force Fix and Build
+      - name: Build Right (Central)
         run: |
-          # 1. 無限ループの元になるルートのファイルを掃除
-          rm -f build.yaml west.yml 2>/dev/null || true
-          
-          # 2. シールドファイルを ZMK 本体側のディレクトリに直接コピー（認識を確実にする）
           mkdir -p zmk/app/boards/shields/clear_orange
           cp -r boards/shields/clear_orange/* zmk/app/boards/shields/clear_orange/
-          
-          # 3. ビルド実行
           west build -s zmk/app -b nice_nano_v2 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-          -DSHIELD=clear_orange_right
+          -DSHIELD=clear_orange_right \
+          -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
 
-      - name: Archive artifacts
+      - name: Archive Right
         uses: actions/upload-artifact@v4
         with:
-          name: firmware
+          name: firmware_right_central
+          path: build/zephyr/zmk.uf2
+
+      - name: Build Left (Peripheral)
+        run: |
+          rm -rf build
+          west build -s zmk/app -b nice_nano_v2 -- \
+          -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
+          -DSHIELD=clear_orange_left
+
+      - name: Archive Left
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware_left_peripheral
           path: build/zephyr/zmk.uf2
