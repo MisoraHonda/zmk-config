@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
       - name: Cache west modules
         uses: actions/cache@v4
         env:
@@ -35,9 +35,17 @@ jobs:
       - name: West Zephyr export
         run: west zephyr-export
 
-      - name: West Build (Right)
+      - name: Prepare and Build
         run: |
           west build -s zmk/app -b nice_nano_v2 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-          -DSHIELD=clear_orange_right \
-          -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}/boards"
+          -DSHIELD=clear_orange_right
+
+      - name: Rename zmk.uf2
+        run: cp build/zephyr/zmk.uf2 clear_orange_right_nice_nano_v2.uf2
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: clear_orange_right_nice_nano_v2.uf2
