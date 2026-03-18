@@ -6,7 +6,7 @@
 / {
     chosen {
         zmk,kscan = &kscan0;
-    }
+    }; // ←ここにセミコロンが必要でした！
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
@@ -30,18 +30,16 @@
             ;
     };
 
-    /* --- ここからトラックボール(MX8650A)の定義 --- */
-    /* 回路図の11番(P1.04)と12番(P1.06)を使用 */
+    /* トラックボールの定義 */
     trackball_bus: trackball_bus {
-        compatible = "zmk,input-sensor-pmw3610"; // MX8650Aと互換性のあるドライバ
+        compatible = "zmk,input-sensor-pmw3610";
         status = "okay";
         
-        // 回路図 PIN 12 = P1.06 (SCLK)
+        // PIN 12 = P1.06 (SCLK)
         sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
-        // 回路図 PIN 11 = P1.04 (SDIO)
+        // PIN 11 = P1.04 (SDIO)
         sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
         
-        // 解像度の設定（お好みで調整してください）
         cpi = <800>;
     };
 };
