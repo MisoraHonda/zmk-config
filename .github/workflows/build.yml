@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
       - name: Cache west modules
         uses: actions/cache@v4
         env:
@@ -24,23 +25,20 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/west.yml') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+
       - name: West Init
-        run: west init -l config/
+        run: west init -l config
+
       - name: West Update
         run: west update
+
       - name: West Zephyr export
         run: west zephyr-export
+
       - name: West Build (Right)
+        # 修正ポイント: モジュールパスを "boards" ディレクトリに直結させます
         run: |
           west build -s zmk/app -b nice_nano_v2 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
+          -DZMK_EXTRA_MODULES="${GITHUB_WORKSPACE}" \
           -DSHIELD=clear_orange_right
-      - name: Rename zmk.uf2
-        run: cp build/zephyr/zmk.uf2 clear_orange_right_nice_nano_v2.uf2
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware
-          path: clear_orange_right_nice_nano_v2.uf2
