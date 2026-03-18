@@ -1,0 +1,20 @@
+menuconfig SHIELD_CLEAR_ORANGE
+    bool "Clear Orange Shield"
+    help
+      Support for the Clear Orange custom shield.
+
+if SHIELD_CLEAR_ORANGE
+
+config SHIELD_CLEAR_ORANGE_LEFT
+    bool "Left Half"
+    default n
+    help
+      Enable if this is the left half of the Clear Orange keyboard.
+
+config SHIELD_CLEAR_ORANGE_RIGHT
+    bool "Right Half"
+    default n
+    help
+      Enable if this is the right half of the Clear Orange keyboard.
+
+endif
