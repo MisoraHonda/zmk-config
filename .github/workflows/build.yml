@@ -4,6 +4,6 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@stable
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.5.0
     with:
       config_path: config
