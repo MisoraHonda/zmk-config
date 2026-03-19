@@ -12,7 +12,6 @@
         ;
 };
 
-/* 右手側だけのトラックボール定義 */
 / {
     trackball_bus: trackball_bus {
         compatible = "zmk,input-sensor-pmw3610";
