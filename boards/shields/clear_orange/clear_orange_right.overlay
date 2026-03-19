@@ -1,45 +1,24 @@
-#include <dt-bindings/zmk/matrix_transform.h>
-#include <dt-bindings/zmk/outputs.h>
-#include <dt-bindings/zmk/bt.h>
-#include <dt-bindings/zmk/keys.h>
+#include "clear_orange.dtsi"
 
+&kscan0 {
+    col-gpios
+        = <&gpio0 31 GPIO_ACTIVE_HIGH> 
+        , <&gpio0 29 GPIO_ACTIVE_HIGH> 
+        , <&gpio0 2  GPIO_ACTIVE_HIGH> 
+        , <&gpio1 15 GPIO_ACTIVE_HIGH> 
+        , <&gpio1 13 GPIO_ACTIVE_HIGH> 
+        , <&gpio1 11 GPIO_ACTIVE_HIGH> 
+        , <&gpio0 10 GPIO_ACTIVE_HIGH> 
+        ;
+};
+
+/* 右手側だけのトラックボール定義 */
 / {
-    chosen {
-        zmk,kscan = &kscan0;
-    }; // ←ここにセミコロンが必要でした！
-
-    kscan0: kscan {
-        compatible = "zmk,kscan-gpio-matrix";
-        diode-direction = "row2col";
-
-        row-gpios
-            = <&gpio0 22 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // PIN 7 (P0.22)
-            , <&gpio0 24 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // PIN 8 (P0.24)
-            , <&gpio1 0  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // PIN 9 (P1.00)
-            , <&gpio0 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> // PIN 10 (P0.11)
-            ;
-
-        col-gpios
-            = <&gpio0 31 GPIO_ACTIVE_HIGH> // PIN 20 (P0.31)
-            , <&gpio0 29 GPIO_ACTIVE_HIGH> // PIN 19 (P0.29)
-            , <&gpio0 2  GPIO_ACTIVE_HIGH> // PIN 18 (P0.02)
-            , <&gpio1 15 GPIO_ACTIVE_HIGH> // PIN 17 (P1.15)
-            , <&gpio1 13 GPIO_ACTIVE_HIGH> // PIN 16 (P1.13)
-            , <&gpio1 11 GPIO_ACTIVE_HIGH> // PIN 15 (P1.11)
-            , <&gpio0 10 GPIO_ACTIVE_HIGH> // PIN 14 (P0.10)
-            ;
-    };
-
-    /* トラックボールの定義 */
     trackball_bus: trackball_bus {
         compatible = "zmk,input-sensor-pmw3610";
         status = "okay";
-        
-        // PIN 12 = P1.06 (SCLK)
         sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
-        // PIN 11 = P1.04 (SDIO)
         sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
-        
         cpi = <800>;
     };
 };
