@@ -19,22 +19,12 @@ jobs:
 
       - name: Build
         run: |
-<<<<<<< HEAD
-          # 構造を config/shields に直したので、標準の引数だけで 100% 見つかります
-=======
-          # SHIELD_DIRECTORIES を boards フォルダまで踏み込んで指定します
->>>>>>> ac1c8b33450ef2ce3408f55483ff0dbd2a157203
           west build -s zmk/app -b nice_nano -- \
-          -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-          -DSHIELD=clear_orange_right \
-          -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
-<<<<<<< HEAD
-          -DZEPHYR_MODULES="${GITHUB_WORKSPACE}/zmk/app/module"
-=======
-          -DZEPHYR_MODULES="${GITHUB_WORKSPACE}/zmk/app/module" \
-          -DSHIELD_DIRECTORIES="${GITHUB_WORKSPACE}/config/boards"
->>>>>>> ac1c8b33450ef2ce3408f55483ff0dbd2a157203
+            -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
+            -DSHIELD=clear_orange_right \
+            -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
+            -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
+            -DZEPHYR_MODULES="${GITHUB_WORKSPACE}/zmk/app/module"
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
