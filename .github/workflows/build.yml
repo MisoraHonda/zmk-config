@@ -21,11 +21,11 @@ jobs:
         run: |
           mkdir -p zmk/app/boards/shields/clear_orange
           cp -r boards/shields/clear_orange/* zmk/app/boards/shields/clear_orange/
-          # ボード名を nice_nano に修正
           west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
-          -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
+          -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
 
       - name: Archive Right Artifact
         uses: actions/upload-artifact@v4
@@ -36,10 +36,10 @@ jobs:
       - name: Build Left (Peripheral)
         run: |
           rm -rf build
-          # ボード名を nice_nano に修正
           west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-          -DSHIELD=clear_orange_left
+          -DSHIELD=clear_orange_left \
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
 
       - name: Archive Left Artifact
         uses: actions/upload-artifact@v4
