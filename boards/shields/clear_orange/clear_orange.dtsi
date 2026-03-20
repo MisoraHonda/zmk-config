@@ -20,14 +20,26 @@
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
-        diode-direction = "row2col";
+        // 回路図に基づき、列から行方向へスキャンするように修正
+        diode-direction = "col2row"; 
 
-        // 暴走対策: PULL_UP と ACTIVE_LOW に変更
+        // Row側をプルアップして待ち受けます
         row-gpios
-            = <&gpio0 22 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-            , <&gpio0 24 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-            , <&gpio1 0  (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-            , <&gpio0 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+            = <&gpio0 22 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row0: 7ピン
+            , <&gpio0 24 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row1: 8ピン
+            , <&gpio1 0  (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row2: 9ピン
+            , <&gpio0 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row3: 10ピン
+            ;
+
+        // Col側をスキャン信号として使用します
+        col-gpios
+            = <&gpio0 31 GPIO_ACTIVE_LOW> // Col0: 20ピン
+            , <&gpio0 29 GPIO_ACTIVE_LOW> // Col1: 19ピン
+            , <&gpio0 2  GPIO_ACTIVE_LOW> // Col2: 18ピン
+            , <&gpio1 15 GPIO_ACTIVE_LOW> // Col3: 17ピン
+            , <&gpio1 13 GPIO_ACTIVE_LOW> // Col4: 16ピン
+            , <&gpio1 11 GPIO_ACTIVE_LOW> // Col5: 15ピン
+            , <&gpio0 10 GPIO_ACTIVE_LOW> // Col6: 14ピン
             ;
     };
 };
