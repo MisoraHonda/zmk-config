@@ -19,7 +19,6 @@ jobs:
 
       - name: Build Right (Central)
         run: |
-          # -DSHIELD_DIRECTORIES で、リポジトリのルートにある boards フォルダを強制指定します
           west build -s zmk/app -b nrf52840dk/nrf52840 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
@@ -45,7 +44,5 @@ jobs:
       - name: Archive Left Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: firmware_left_peripheral
-          path: build/zephyr/zmk.uf2
           name: firmware_left_peripheral
           path: build/zephyr/zmk.uf2
