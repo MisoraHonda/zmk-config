@@ -76,6 +76,7 @@ struct k_thread mx8650_thread_data;
 
 static int mx8650_init(const struct device *dev) {
     const struct mx8650_config *cfg = dev->config;
+    if (!gpio_is_ready_dt(&cfg->sclk) || !gpio_is_ready_dt(&cfg->sdio)) return -ENODEV;
     gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_INACTIVE);
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
     k_thread_create(&mx8650_thread_data, mx8650_stack, 1024,
@@ -91,6 +92,6 @@ static int mx8650_init(const struct device *dev) {
     }; \
     DEVICE_DT_INST_DEFINE(n, mx8650_init, NULL, NULL, \
                          &mx8650_config_##n, POST_KERNEL, \
-                         60, NULL); // Priority 60
+                         CONFIG_INPUT_INIT_PRIORITY, NULL);
 
 DT_INST_FOREACH_STATUS_OKAY(MX8650_INST)
