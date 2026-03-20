@@ -1,3 +1,4 @@
-# config/zephyr/module.yml
 build:
-  kconfig: Kconfig
+  settings:
+    kconfig: ../drivers/sensor/mx8650/Kconfig
+  cmake: ../drivers/sensor/mx8650
