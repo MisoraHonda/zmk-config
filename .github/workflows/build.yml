@@ -19,14 +19,14 @@ jobs:
 
       - name: Force Prepare Shields
         run: |
-          # あなたの boards/shields を ZMK 本体へ強制コピー
-          # これで "Shield not found" は物理的にあり得なくなります
-          mkdir -p zmk/app/boards/shields
-          cp -r boards/shields/* zmk/app/boards/shields/
+          # 1. ZMKの標準モジュールディレクトリ内にシールドを強制コピー
+          # ここに置けば、ビルドシステムは「標準シールド」として認識します
+          mkdir -p zmk/app/module/boards/shields/clear_orange
+          cp -r boards/shields/clear_orange/* zmk/app/module/boards/shields/clear_orange/
 
       - name: Build Right (Central)
         run: |
-          # ボード名はリストに必ず存在する汎用名を使用
+          # ボード名は確実に存在する nrf52840dk/nrf52840 を使用
           west build -s zmk/app -b nrf52840dk/nrf52840 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
@@ -42,7 +42,6 @@ jobs:
       - name: Build Left (Peripheral)
         run: |
           rm -rf build
-          # 左手側も同様に汎用名でビルド
           west build -s zmk/app -b nrf52840dk/nrf52840 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_left \
