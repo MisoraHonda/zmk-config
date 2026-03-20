@@ -1,35 +1,39 @@
 #include "clear_orange.dtsi"
 
 &kscan0 {
+    /* 行列スキャンの列ピン定義（回路図のCol0-6に対応） */
     col-gpios
-        = <&gpio0 31 GPIO_ACTIVE_LOW>
-        , <&gpio0 29 GPIO_ACTIVE_LOW>
-        , <&gpio0 2  GPIO_ACTIVE_LOW>
-        , <&gpio1 15 GPIO_ACTIVE_LOW>
-        , <&gpio1 13 GPIO_ACTIVE_LOW>
-        , <&gpio1 11 GPIO_ACTIVE_LOW>
-        , <&gpio0 10 GPIO_ACTIVE_LOW>
+        = <&gpio0 31 GPIO_ACTIVE_LOW> // Col0: 20ピン (P0.31)
+        , <&gpio0 29 GPIO_ACTIVE_LOW> // Col1: 19ピン (P0.29)
+        , <&gpio0 2  GPIO_ACTIVE_LOW> // Col2: 18ピン (P0.02)
+        , <&gpio1 15 GPIO_ACTIVE_LOW> // Col3: 17ピン (P1.15)
+        , <&gpio1 13 GPIO_ACTIVE_LOW> // Col4: 16ピン (P1.13)
+        , <&gpio1 11 GPIO_ACTIVE_LOW> // Col5: 15ピン (P1.11)
+        , <&gpio0 10 GPIO_ACTIVE_LOW> // Col6: 14ピン (P0.10)
         ;
 };
 
 / {
-    /* マウス入力をZMKのメインストリームに流す設定 */
+    /* 1. トラックボールの動きをマウス入力として登録する設定 */
     trackball_listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
     };
 
+    /* 2. MX8650A (PMW3610互換) センサー自体の定義 */
     trackball: trackball {
-        compatible = "pixart,pmw3610"; // ドライバ名を正式なものに修正
+        compatible = "pixart,pmw3610";
         status = "okay";
-        /* 回路図 PIN 12 = P1.06, PIN 11 = P1.04  */
-        sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
-        sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
 
-        /* MX8650Aは動きを検知すると信号を出しますが、回路図で繋がっていない場合は */
-        /* ZMK側でポーリング（定期確認）させるために適当な空きピンを割り当てるか、定義を工夫します */
-        irq-gpios = <&gpio1 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; 
+        /* 回路図より: PIN 12 = P1.06 (SCLK), PIN 11 = P1.04 (SDIO) */
+        sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>; [cite: 54]
+        sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>; [cite: 49]
 
+        /* 割り込みピン(MOTSWK)の設定。回路図で未接続の場合は空きピンを割り当て */
+        /* ここでは例として P0.06 (D1) を指定していますが、実機に合わせて調整してください */
+        irq-gpios = <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+
+        /* 解像度設定（数値が大きいほど速く動きます） */
         cpi = <800>;
     };
 };
