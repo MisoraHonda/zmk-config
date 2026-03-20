@@ -4,45 +4,4 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    container:
-      image: zmkfirmware/zmk-build-arm:stable
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: West Init and Update
-        run: |
-          west init -l config
-          west update
-          west zephyr-export
-
-      - name: Build Right (Central)
-        run: |
-          west build -s zmk/app -b nice_nano -- \
-            -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-            -DSHIELD=clear_orange_right \
-            -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
-            -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
-            -DZEPHYR_MODULES="${GITHUB_WORKSPACE}/zmk/app/module"
-
-      - name: Archive Right Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware_right
-          path: build/zephyr/zmk.uf2
-
-      - name: Build Left (Peripheral)
-        run: |
-          rm -rf build
-          west build -s zmk/app -b nice_nano -- \
-            -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-            -DSHIELD=clear_orange_left \
-            -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
-            -DZEPHYR_MODULES="${GITHUB_WORKSPACE}/zmk/app/module"
-
-      - name: Archive Left Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware_left
-          path: build/zephyr/zmk.uf2
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
