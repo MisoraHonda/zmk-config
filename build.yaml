@@ -21,5 +21,7 @@
 include:
   - board: nice_nano//zmk
     shield: clear_orange_right
+    # ↓ この一行を追加することで、右手が親機（パソコンと通信する側）になります
+    cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
   - board: nice_nano//zmk
     shield: clear_orange_left
