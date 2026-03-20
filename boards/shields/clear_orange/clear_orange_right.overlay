@@ -1,5 +1,6 @@
 #include "clear_orange.dtsi"
 
+/* 既存のkscan0ノードへの追加設定 */
 &kscan0 {
     col-gpios
         = <&gpio0 31 GPIO_ACTIVE_LOW>
@@ -12,8 +13,9 @@
         ;
 };
 
+/* 新しいノードの定義はここから */
 / {
-    trackball_listener {
+    trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
     };
@@ -22,16 +24,13 @@
         compatible = "pixart,pmw3610";
         status = "okay";
 
-        /* 回路図: PIN 12 = P1.06 (SCLK), PIN 11 = P1.04 (SDIO) */
+        /* 回路図: PIN 12 = P1.06 (SCLK), PIN 11 = P1.04 (SDIO) [cite: 4, 6, 48, 49, 53, 54] */
         sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
         sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
 
-        /* 割り込みピン: 回路図で未接続のため、未使用のP0.06を割り当て */
-        /* カッコなしの記述に統一してパースエラーを回避 */
-        irq-gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
+        /* 割り込みピン(MOTSWK)は回路図で未接続のため、未使用のP0.06を割り当て [cite: 6] */
+        irq-gpios = <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 
         cpi = <800>;
-    };
-};
     };
 };
