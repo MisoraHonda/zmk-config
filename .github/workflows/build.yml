@@ -17,38 +17,17 @@ jobs:
           west update
           west zephyr-export
 
-      - name: Prepare Shield Files
+      - name: Build
         run: |
-          # 手動移動の代わりに、ビルド環境内で config/boards フォルダを作成してコピー
-          mkdir -p config/boards
-          cp -r boards/* config/boards/
-          # 確認用：ファイルが正しく配置されたかログに出力
-          ls -R config/boards
-
-      - name: Build Right (Central)
-        run: |
+          # 移動済みなので、標準の ZMK_CONFIG 指定だけで全てが見つかります
           west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
           -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
           -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
 
-      - name: Archive Right Artifact
+      - name: Archive Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: firmware_right_central
-          path: build/zephyr/zmk.uf2
-
-      - name: Build Left (Peripheral)
-        run: |
-          rm -rf build
-          west build -s zmk/app -b nice_nano -- \
-          -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
-          -DSHIELD=clear_orange_left \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
-
-      - name: Archive Left Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware_left_peripheral
+          name: firmware
           path: build/zephyr/zmk.uf2
