@@ -2,6 +2,7 @@ config SENSOR_MX8650
 	bool "MX8650 optical mouse sensor"
 	default y
 	depends on DT_HAS_PIXART_MX8650_ENABLED
+	select SENSOR
 	select GPIO
 	help
 	  Enable driver for MX8650 optical mouse sensor.
