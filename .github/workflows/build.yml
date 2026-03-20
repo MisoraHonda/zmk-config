@@ -17,22 +17,17 @@ jobs:
           west update
           west zephyr-export
 
-      - name: Prepare Boards and Modules
+      - name: Force Prepare Shields
         run: |
-          # 1. ルートの boards を ZMK の標準シールドディレクトリへコピー
-          mkdir -p zmk/app/boards/shields/clear_orange
-          cp -r boards/shields/clear_orange/* zmk/app/boards/shields/clear_orange/
-
-          # 2. 外部ドライバを ZMK のモジュールディレクトリへコピー
-          # これにより Kconfig エラーを物理的に回避します
-          mkdir -p zmk/app/modules
-          cp -r zmk-pmw3610-driver zmk/app/modules/
-          cp -r zmk-input-behavior-listener zmk/app/modules/
+          # あなたの boards/shields を ZMK 本体へ強制コピー
+          # これで "Shield not found" は物理的にあり得なくなります
+          mkdir -p zmk/app/boards/shields
+          cp -r boards/shields/* zmk/app/boards/shields/
 
       - name: Build Right (Central)
         run: |
-          # ボード名はリストにあった確実に存在する名称を使用します
-          west build -s zmk/app -b nice_nano -- \
+          # ボード名はリストに必ず存在する汎用名を使用
+          west build -s zmk/app -b nrf52840dk/nrf52840 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
           -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
@@ -47,7 +42,8 @@ jobs:
       - name: Build Left (Peripheral)
         run: |
           rm -rf build
-          west build -s zmk/app -b nice_nano -- \
+          # 左手側も同様に汎用名でビルド
+          west build -s zmk/app -b nrf52840dk/nrf52840 -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_left \
           -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
