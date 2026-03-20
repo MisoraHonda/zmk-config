@@ -17,16 +17,26 @@ jobs:
           west update
           west zephyr-export
 
+      - name: Prepare Boards and Modules
+        run: |
+          # 1. ルートの boards を ZMK の標準シールドディレクトリへコピー
+          mkdir -p zmk/app/boards/shields/clear_orange
+          cp -r boards/shields/clear_orange/* zmk/app/boards/shields/clear_orange/
+
+          # 2. 外部ドライバを ZMK のモジュールディレクトリへコピー
+          # これにより Kconfig エラーを物理的に回避します
+          mkdir -p zmk/app/modules
+          cp -r zmk-pmw3610-driver zmk/app/modules/
+          cp -r zmk-input-behavior-listener zmk/app/modules/
+
       - name: Build Right (Central)
         run: |
-          # 1. zmk/app をモジュールとして認識させる
-          # 2. リポジトリ直下の boards をシールドの探索パスに加える
+          # ボード名はリストにあった確実に存在する名称を使用します
           west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
           -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk/app;${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
-          -DSHIELD_DIRECTORIES="${GITHUB_WORKSPACE}"
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
 
       - name: Archive Right Artifact
         uses: actions/upload-artifact@v4
@@ -40,8 +50,7 @@ jobs:
           west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_left \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk/app;${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
-          -DSHIELD_DIRECTORIES="${GITHUB_WORKSPACE}"
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
 
       - name: Archive Left Artifact
         uses: actions/upload-artifact@v4
