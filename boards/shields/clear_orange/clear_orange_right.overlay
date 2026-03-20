@@ -1,8 +1,6 @@
-/* clear_orange_right.overlay */
 #include "clear_orange.dtsi"
 
 &kscan0 {
-    // 列の定義（成功した内容をそのまま）
     col-gpios
         = <&gpio0 31 GPIO_ACTIVE_LOW>
         , <&gpio0 29 GPIO_ACTIVE_LOW>
@@ -15,13 +13,23 @@
 };
 
 / {
+    /* マウス入力をZMKのメインストリームに流す設定 */
+    trackball_listener {
+        compatible = "zmk,input-listener";
+        device = <&trackball>;
+    };
+
     trackball: trackball {
-        compatible = "zmk,input-sensor-pmw3610"; // MX8650A互換
+        compatible = "pixart,pmw3610"; // ドライバ名を正式なものに修正
         status = "okay";
-        // 回路図 PIN 12 = P1.06 (SCLK) 
+        /* 回路図 PIN 12 = P1.06, PIN 11 = P1.04  */
         sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
-        // 回路図 PIN 11 = P1.04 (SDIO) 
         sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+
+        /* MX8650Aは動きを検知すると信号を出しますが、回路図で繋がっていない場合は */
+        /* ZMK側でポーリング（定期確認）させるために適当な空きピンを割り当てるか、定義を工夫します */
+        irq-gpios = <&gpio1 0 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>; 
+
         cpi = <800>;
     };
 };
