@@ -23,7 +23,7 @@ jobs:
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
           -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk/app;${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
           -DSHIELD_AS_MODULE=ON
 
       - name: Archive Right Artifact
@@ -38,7 +38,7 @@ jobs:
           west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_left \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk/app;${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
           -DSHIELD_AS_MODULE=ON
 
       - name: Archive Left Artifact
