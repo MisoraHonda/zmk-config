@@ -1,7 +1,6 @@
 #include "clear_orange.dtsi"
 
 &kscan0 {
-    /* キー行列の列ピン定義（回路図のCol0-6 ） */
     col-gpios
         = <&gpio0 31 GPIO_ACTIVE_LOW>
         , <&gpio0 29 GPIO_ACTIVE_LOW>
@@ -14,24 +13,25 @@
 };
 
 / {
-    /* トラックボールの入力をZMKシステムに繋ぐリスナー */
     trackball_listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
     };
 
-    /* トラックボール(MX8650A)本体の定義 [cite: 5, 6] */
     trackball: trackball {
         compatible = "pixart,pmw3610";
         status = "okay";
 
-        /* 回路図より: PIN 12 = P1.06 (SCLK), PIN 11 = P1.04 (SDIO) */
+        /* 回路図: PIN 12 = P1.06 (SCLK), PIN 11 = P1.04 (SDIO) */
         sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
         sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
 
-        /* 割り込みピン(MOTSWK) [cite: 6]。回路図で未接続のため、未使用ピンを直接指定（カッコを削除） */
-        irq-gpios = <&gpio0 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+        /* 割り込みピン: 回路図で未接続のため、未使用のP0.06を割り当て */
+        /* カッコなしの記述に統一してパースエラーを回避 */
+        irq-gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
 
         cpi = <800>;
+    };
+};
     };
 };
