@@ -1,0 +1,13 @@
+description: MX8650 optical mouse sensor
+
+compatible: "pixart,mx8650"
+
+include: [sensor-device.yaml]
+
+properties:
+  sclk-gpios:
+    type: phandle-array
+    required: true
+  sdio-gpios:
+    type: phandle-array
+    required: true
