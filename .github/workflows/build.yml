@@ -19,12 +19,14 @@ jobs:
 
       - name: Build
         run: |
-          # 移動済みなので、標準の ZMK_CONFIG 指定だけで全てが見つかります
+          # フォルダを config/boards に移動済みであることを前提に
+          # nice_nano の定義が含まれる zmk/app/module を検索パスに追加します
           west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
           -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
+          -DZEPHYR_MODULES="${GITHUB_WORKSPACE}/zmk/app/module"
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
