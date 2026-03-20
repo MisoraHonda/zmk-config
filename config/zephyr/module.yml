@@ -1,6 +1,3 @@
 # config/zephyr/module.yml
 build:
   kconfig: Kconfig
-  depends:
-    - zmk-pmw3610-driver
-    - zmk-input-behavior-listener
