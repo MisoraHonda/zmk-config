@@ -1,3 +1,3 @@
 # config/Kconfig
-osource "../zmk-pmw3610-driver/Kconfig"
-osource "../zmk-input-behavior-listener/Kconfig"
+osource "../../zmk-pmw3610-driver/Kconfig"
+osource "../../zmk-input-behavior-listener/Kconfig"
