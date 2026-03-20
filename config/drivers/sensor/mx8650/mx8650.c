@@ -10,56 +10,52 @@ struct mx8650_config {
     struct gpio_dt_spec sdio;
 };
 
-/* 1バイト書き込み: データシート 6.2 項準拠 */
+/* 1バイト書き込み: MSBを1にする */
 static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
     const struct mx8650_config *cfg = dev->config;
-    addr |= 0x80; // Write MSB = 1
+    addr |= 0x80; 
 
     gpio_pin_configure_dt(&cfg->sdio, GPIO_OUTPUT_ACTIVE);
-
-    // アドレス送信 (8bit)
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         gpio_pin_set_dt(&cfg->sdio, (addr >> i) & 1);
-        k_busy_wait(5);
+        k_busy_wait(2);
         gpio_pin_set_dt(&cfg->sclk, 1);
-        k_busy_wait(5);
+        k_busy_wait(2);
     }
-    // データ送信 (8bit)
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         gpio_pin_set_dt(&cfg->sdio, (data >> i) & 1);
-        k_busy_wait(5);
+        k_busy_wait(2);
         gpio_pin_set_dt(&cfg->sclk, 1);
-        k_busy_wait(5);
+        k_busy_wait(2);
     }
 }
 
-/* 1バイト読み出し: データシート 6.3 項準拠 */
+/* 1バイト読み出し: MSBを0にする */
 static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
     const struct mx8650_config *cfg = dev->config;
     uint8_t res = 0;
-    addr &= 0x7F; // Read MSB = 0
+    addr &= 0x7F;
 
     gpio_pin_configure_dt(&cfg->sdio, GPIO_OUTPUT_ACTIVE);
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         gpio_pin_set_dt(&cfg->sdio, (addr >> i) & 1);
-        k_busy_wait(5);
+        k_busy_wait(2);
         gpio_pin_set_dt(&cfg->sclk, 1);
-        k_busy_wait(5);
+        k_busy_wait(2);
     }
 
-    // 入力に切り替え (Hi-Z)
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
-    k_busy_wait(10); // ターンアラウンド
+    k_busy_wait(5); // ターンアラウンド
 
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
-        k_busy_wait(5);
+        k_busy_wait(2);
         gpio_pin_set_dt(&cfg->sclk, 1);
-        k_busy_wait(5);
         if (gpio_pin_get_dt(&cfg->sdio)) res |= (1 << i);
+        k_busy_wait(2);
     }
     return res;
 }
@@ -67,21 +63,20 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
 static void mx8650_thread(void *p1, void *p2, void *p3) {
     const struct device *dev = p1;
     
-    // ソフトリセット等の初期化処理をここに入れることも可能
-    mx8650_write(dev, 0x06, 0x00); // 念のため初期解像度設定(データシート参照)
-
+    // 起動時の初期化: DataSheet P.15
+    mx8650_write(dev, 0x06, 0x00); // 800 CPI
+    
     while (1) {
         uint8_t status = mx8650_read(dev, 0x02);
-        if (status & 0x80) { // Motion detected
-            // 相対移動量の読み取り (2の補数)
+        if (status & 0x80) { // Motion bit
             int8_t dx = (int8_t)mx8650_read(dev, 0x03);
             int8_t dy = (int8_t)mx8650_read(dev, 0x04);
             
-            // ZMKの入力イベントとして報告
+            // XとYを個別に報告
             input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
             input_report_rel(dev, INPUT_REL_Y, dy, true, K_FOREVER);
         }
-        k_msleep(10); // ポーリング間隔
+        k_msleep(10);
     }
 }
 
@@ -90,11 +85,6 @@ struct k_thread mx8650_thread_data;
 
 static int mx8650_init(const struct device *dev) {
     const struct mx8650_config *cfg = dev->config;
-
-    if (!gpio_is_ready_dt(&cfg->sclk) || !gpio_is_ready_dt(&cfg->sdio)) {
-        return -ENODEV;
-    }
-
     gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_INACTIVE);
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
 
