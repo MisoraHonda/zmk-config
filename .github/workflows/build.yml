@@ -17,14 +17,30 @@ jobs:
           west update
           west zephyr-export
 
+      - name: Force Integrate Shield and Drivers
+        run: |
+          # 1. あなたのシールドを ZMK 本体の標準ディレクトリへ物理的に上書き
+          # これにより「見つからない」という論理エラーを物理的に排除します
+          mkdir -p zmk/app/boards/shields/clear_orange
+          cp -r boards/shields/clear_orange/* zmk/app/boards/shields/clear_orange/
+          
+          # 2. 外部ドライバを ZMK 本体の module ディレクトリへ統合
+          mkdir -p zmk/app/module/drivers/sensor/pmw3610
+          cp -r zmk-pmw3610-driver/* zmk/app/module/drivers/sensor/pmw3610/
+          
+          # 3. ボード定義 (nice_nano) を探させるための暫定処置
+          # 標準パスを ZEPHYR_MODULES に追加するための環境変数準備
+          echo "ZEPHYR_MODULES=${GITHUB_WORKSPACE}/zmk/app/module" >> $GITHUB_ENV
+
       - name: Build Right (Central)
         run: |
-          west build -s zmk/app -b nrf52840dk/nrf52840 -- \
+          # ボード名は nice_nano に戻します（moduleパスを指定したため）
+          # 万が一 nice_nano でコケた時のため、バックアップとしてボード定義を直接指定
+          west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
           -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
-          -DSHIELD_DIRECTORIES="${GITHUB_WORKSPACE}"
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
 
       - name: Archive Right Artifact
         uses: actions/upload-artifact@v4
@@ -35,11 +51,10 @@ jobs:
       - name: Build Left (Peripheral)
         run: |
           rm -rf build
-          west build -s zmk/app -b nrf52840dk/nrf52840 -- \
+          west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_left \
-          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
-          -DSHIELD_DIRECTORIES="${GITHUB_WORKSPACE}"
+          -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener"
 
       - name: Archive Left Artifact
         uses: actions/upload-artifact@v4
