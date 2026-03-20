@@ -19,15 +19,14 @@ jobs:
 
       - name: Build
         run: |
-          # 1. nice_nano 定義を読み込むためのパス指定
-          # 2. あなたのシールド定義があるディレクトリを直接指定
+          # SHIELD_DIRECTORIES を boards フォルダまで踏み込んで指定します
           west build -s zmk/app -b nice_nano -- \
           -DZMK_CONFIG="${GITHUB_WORKSPACE}/config" \
           -DSHIELD=clear_orange_right \
           -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y \
           -DZEPHYR_EXTRA_MODULES="${GITHUB_WORKSPACE}/zmk-pmw3610-driver;${GITHUB_WORKSPACE}/zmk-input-behavior-listener" \
           -DZEPHYR_MODULES="${GITHUB_WORKSPACE}/zmk/app/module" \
-          -DSHIELD_DIRECTORIES="${GITHUB_WORKSPACE}/config"
+          -DSHIELD_DIRECTORIES="${GITHUB_WORKSPACE}/config/boards"
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
