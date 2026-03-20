@@ -10,11 +10,10 @@ struct mx8650_config {
     struct gpio_dt_spec sdio;
 };
 
-/* 1バイト書き込み: MSBを1にする */
+/* 1バイト書き込み */
 static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
     const struct mx8650_config *cfg = dev->config;
     addr |= 0x80; 
-
     gpio_pin_configure_dt(&cfg->sdio, GPIO_OUTPUT_ACTIVE);
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
@@ -32,12 +31,11 @@ static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
     }
 }
 
-/* 1バイト読み出し: MSBを0にする */
+/* 1バイト読み出し */
 static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
     const struct mx8650_config *cfg = dev->config;
     uint8_t res = 0;
     addr &= 0x7F;
-
     gpio_pin_configure_dt(&cfg->sdio, GPIO_OUTPUT_ACTIVE);
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
@@ -46,10 +44,8 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
         gpio_pin_set_dt(&cfg->sclk, 1);
         k_busy_wait(2);
     }
-
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
-    k_busy_wait(5); // ターンアラウンド
-
+    k_busy_wait(5);
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         k_busy_wait(2);
@@ -62,17 +58,12 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
 
 static void mx8650_thread(void *p1, void *p2, void *p3) {
     const struct device *dev = p1;
-    
-    // 起動時の初期化: DataSheet P.15
     mx8650_write(dev, 0x06, 0x00); // 800 CPI
-    
     while (1) {
         uint8_t status = mx8650_read(dev, 0x02);
-        if (status & 0x80) { // Motion bit
+        if (status & 0x80) {
             int8_t dx = (int8_t)mx8650_read(dev, 0x03);
             int8_t dy = (int8_t)mx8650_read(dev, 0x04);
-            
-            // XとYを個別に報告
             input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
             input_report_rel(dev, INPUT_REL_Y, dy, true, K_FOREVER);
         }
@@ -87,7 +78,6 @@ static int mx8650_init(const struct device *dev) {
     const struct mx8650_config *cfg = dev->config;
     gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_INACTIVE);
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
-
     k_thread_create(&mx8650_thread_data, mx8650_stack, 1024,
                     mx8650_thread, (void *)dev, NULL, NULL,
                     K_PRIO_COOP(10), 0, K_NO_WAIT);
@@ -101,6 +91,6 @@ static int mx8650_init(const struct device *dev) {
     }; \
     DEVICE_DT_INST_DEFINE(n, mx8650_init, NULL, NULL, \
                          &mx8650_config_##n, POST_KERNEL, \
-                         CONFIG_INPUT_INIT_PRIORITY, NULL);
+                         60, NULL); // Priority 60
 
 DT_INST_FOREACH_STATUS_OKAY(MX8650_INST)
