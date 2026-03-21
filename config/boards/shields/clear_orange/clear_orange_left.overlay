@@ -1,5 +1,6 @@
 #include "clear_orange.dtsi"
 
+/* 左手側のキーマトリクス（列）のピン設定 */
 &kscan0 {
     col-gpios
         = <&gpio0 31 GPIO_ACTIVE_LOW>
@@ -10,4 +11,21 @@
         , <&gpio1 11 GPIO_ACTIVE_LOW>
         , <&gpio0 10 GPIO_ACTIVE_LOW>
         ;
+};
+
+/ {
+    /* ログ出力先として USB CDC ACM を指定 */
+    chosen {
+        zephyr,console = &cdc_acm_uart0;
+        zephyr,shell-uart = &cdc_acm_uart0;
+    };
+};
+
+/* ログ出力用の仮想シリアルポート（CDC ACM）を定義 */
+&zephyr_udc0 {
+    status = "okay";
+
+    cdc_acm_uart0: cdc_acm_uart0 {
+        compatible = "zephyr,cdc-acm-uart";
+    };
 };
