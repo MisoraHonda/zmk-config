@@ -76,26 +76,32 @@ static void mx8650_thread(void *p1, void *p2, void *p3) {
 
     while (1) {
         if (loop_counter % 100 == 0) {
-            // ▼ 2. 確実に起きているはずのセンサーにPIDを聞く ▼
             uint8_t pid1 = mx8650_read(dev, 0x00);
             uint8_t pid2 = mx8650_read(dev, 0x01);
+            // ログが邪魔なら printk の行をコメントアウト(//)してもOKです
             printk("=== MX8650 ALIVE === PID1: 0x%02x, PID2: 0x%02x\n", pid1, pid2);
         }
         loop_counter++;
 
         uint8_t status = mx8650_read(dev, 0x02);
         
-        // ▼ 0xFF (通信失敗/配線未接続) の場合はマウスカーソルを動かさないようにブロック ▼
         if (status != 0xFF && (status & 0x80)) {
-            int8_t dx = (int8_t)mx8650_read(dev, 0x03);
-            int8_t dy = (int8_t)mx8650_read(dev, 0x04);
-            input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
-            input_report_rel(dev, INPUT_REL_Y, dy, true, K_FOREVER);
+            // 1. センサーから生のデータを読み取る
+            int8_t raw_dx = (int8_t)mx8650_read(dev, 0x03);
+            int8_t raw_dy = (int8_t)mx8650_read(dev, 0x04);
+
+            // 2. 物理的な取り付け角度（90度回転）を補正する
+            // 報告の動き: 左->下(+Y), 下->右(+X), 右->上(-Y), 上->左(-X)
+            // 補正式: X軸には「生の-Y」、Y軸には「生の+X」を割り当てる
+            int16_t mapped_dx = -raw_dy;
+            int16_t mapped_dy = raw_dx;
+
+            // 3. 補正済みのデータをPCに送る
+            input_report_rel(dev, INPUT_REL_X, mapped_dx, false, K_FOREVER);
+            input_report_rel(dev, INPUT_REL_Y, mapped_dy, true, K_FOREVER);
         }
         k_msleep(10);
     }
-}
-
 K_THREAD_STACK_DEFINE(mx8650_stack, 1024);
 struct k_thread mx8650_thread_data;
 
