@@ -1,3 +1,7 @@
 build:
   kconfig: drivers/sensor/mx8650/Kconfig
   cmake: drivers/sensor/mx8650
+
+devicetree:
+  bindings:
+    - dts/bindings
