@@ -3,16 +3,17 @@
 #include <zephyr/kernel.h>
 #include <zephyr/input/input.h>
 
-/* 'trackball' というノードラベルがあるかチェック */
 #define TRACKBALL_NODE DT_NODELABEL(trackball)
 
-/* もし 'trackball' が定義されている場合のみ、以下のコードをコンパイルする */
 #if DT_NODE_EXISTS(TRACKBALL_NODE)
 
 struct mx8650_config {
     struct gpio_dt_spec sclk;
     struct gpio_dt_spec sdio;
 };
+
+/* 通信速度を安定させるためのディレイ（10us = 100kHz相当） */
+#define WAIT_TIME 10
 
 static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
     const struct mx8650_config *cfg = dev->config;
@@ -21,16 +22,16 @@ static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         gpio_pin_set_dt(&cfg->sdio, (addr >> i) & 1);
-        k_busy_wait(10);
+        k_busy_wait(WAIT_TIME);
         gpio_pin_set_dt(&cfg->sclk, 1);
-        k_busy_wait(10);
+        k_busy_wait(WAIT_TIME);
     }
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         gpio_pin_set_dt(&cfg->sdio, (data >> i) & 1);
-        k_busy_wait(10);
+        k_busy_wait(WAIT_TIME);
         gpio_pin_set_dt(&cfg->sclk, 1);
-        k_busy_wait(10);
+        k_busy_wait(WAIT_TIME);
     }
 }
 
@@ -42,28 +43,37 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         gpio_pin_set_dt(&cfg->sdio, (addr >> i) & 1);
-        k_busy_wait(10);
+        k_busy_wait(WAIT_TIME);
         gpio_pin_set_dt(&cfg->sclk, 1);
-        k_busy_wait(10);
+        k_busy_wait(WAIT_TIME);
     }
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
-    k_busy_wait(20);
+    k_busy_wait(WAIT_TIME * 2); // ターンアラウンド
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
-        k_busy_wait(10);
+        k_busy_wait(WAIT_TIME);
         gpio_pin_set_dt(&cfg->sclk, 1);
         if (gpio_pin_get_dt(&cfg->sdio)) res |= (1 << i);
-        k_busy_wait(10);
+        k_busy_wait(WAIT_TIME);
     }
     return res;
 }
 
 static void mx8650_thread(void *p1, void *p2, void *p3) {
     const struct device *dev = p1;
-    k_msleep(100);
-    mx8650_write(dev, 0x06, 0x80); // Reset
+    
+    k_msleep(200); // 電源安定待ち
+
+    /* ★デバッグログ：センサーのIDを読み取る */
+    uint8_t pid1 = mx8650_read(dev, 0x00);
+    uint8_t pid2 = mx8650_read(dev, 0x01);
+    printk("MX8650 Status: PID1=0x%02x (Expected:0x02), PID2=0x%02x (Expected:0x51)\n", pid1, pid2);
+
+    /* 初期化シーケンス */
+    mx8650_write(dev, 0x06, 0x80); // Soft Reset
     k_msleep(20);
     mx8650_write(dev, 0x06, 0x00); // 800 CPI
+    
     while (1) {
         uint8_t status = mx8650_read(dev, 0x02);
         if (status & 0x80) {
@@ -81,8 +91,10 @@ struct k_thread mx8650_thread_data;
 
 static int mx8650_init(const struct device *dev) {
     const struct mx8650_config *cfg = dev->config;
-    gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_INACTIVE);
+    /* SCLKはデータシート上、通常Highで待機 */
+    gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_ACTIVE); 
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
+    
     k_thread_create(&mx8650_thread_data, mx8650_stack, 1024,
                     mx8650_thread, (void *)dev, NULL, NULL,
                     K_PRIO_COOP(10), 0, K_NO_WAIT);
@@ -94,13 +106,7 @@ static const struct mx8650_config mx8650_config_0 = {
     .sdio = GPIO_DT_SPEC_GET(TRACKBALL_NODE, sdio_gpios),
 };
 
-DEVICE_DT_DEFINE(TRACKBALL_NODE,
-                 mx8650_init,
-                 NULL,
-                 NULL,
-                 &mx8650_config_0,
-                 POST_KERNEL,
-                 90,
-                 NULL);
+DEVICE_DT_DEFINE(TRACKBALL_NODE, mx8650_init, NULL, NULL,
+                 &mx8650_config_0, POST_KERNEL, 90, NULL);
 
-#endif /* DT_NODE_EXISTS(TRACKBALL_NODE) */
+#endif
