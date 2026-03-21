@@ -84,7 +84,9 @@ static void mx8650_thread(void *p1, void *p2, void *p3) {
         loop_counter++;
 
         uint8_t status = mx8650_read(dev, 0x02);
-        if (status & 0x80) {
+        
+        // ▼ 0xFF (通信失敗/配線未接続) の場合はマウスカーソルを動かさないようにブロック ▼
+        if (status != 0xFF && (status & 0x80)) {
             int8_t dx = (int8_t)mx8650_read(dev, 0x03);
             int8_t dy = (int8_t)mx8650_read(dev, 0x04);
             input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
