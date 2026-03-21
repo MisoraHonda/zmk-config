@@ -16,7 +16,7 @@ struct mx8650_config {
 
 static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
     const struct mx8650_config *cfg = dev->config;
-    addr |= 0x80; // Write MSB=1 [cite: 444]
+    addr |= 0x80; 
     gpio_pin_configure_dt(&cfg->sdio, GPIO_OUTPUT_ACTIVE);
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
@@ -37,7 +37,7 @@ static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
 static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
     const struct mx8650_config *cfg = dev->config;
     uint8_t res = 0;
-    addr &= 0x7F; // Read MSB=0 [cite: 482]
+    addr &= 0x7F;
     gpio_pin_configure_dt(&cfg->sdio, GPIO_OUTPUT_ACTIVE);
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
@@ -60,22 +60,21 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
 
 static void mx8650_thread(void *p1, void *p2, void *p3) {
     const struct device *dev = p1;
-    k_msleep(500);
+    k_msleep(500); 
 
-    // データシート記載の ID1=0x30, ID2=0x5x を確認 [cite: 161, 165]
     uint8_t pid1 = mx8650_read(dev, 0x00);
     uint8_t pid2 = mx8650_read(dev, 0x01);
-    printk("MX8650 LOG: PID1=0x%02x (Exp:0x30), PID2=0x%02x (Exp:0x5X)\n", pid1, pid2);
+    printk("MX8650 LOG: PID1=0x%02x (Exp:0x30), PID2=0x%02x\n", pid1, pid2);
 
-    mx8650_write(dev, 0x06, 0x80); // Reset [cite: 268]
+    mx8650_write(dev, 0x06, 0x80); // Reset
     k_msleep(20);
-    mx8650_write(dev, 0x06, 0x00); // 800 CPI [cite: 285]
+    mx8650_write(dev, 0x06, 0x00); // 800 CPI
     
     while (1) {
         uint8_t status = mx8650_read(dev, 0x02);
-        if (status & 0x80) { // Motion detected [cite: 178]
+        if (status & 0x80) {
             int8_t dx = (int8_t)mx8650_read(dev, 0x03);
-            int8_t dy = (int8_t)mx8650_read(dy, 0x04);
+            int8_t dy = (int8_t)mx8650_read(dev, 0x04);
             input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
             input_report_rel(dev, INPUT_REL_Y, dy, true, K_FOREVER);
         }
