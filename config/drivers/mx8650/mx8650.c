@@ -80,4 +80,37 @@ static void mx8650_thread(void *p1, void *p2, void *p3) {
         uint8_t status = mx8650_read(dev, 0x02);
         if (status & 0x80) {
             int8_t dx = (int8_t)mx8650_read(dev, 0x03);
-            int
+            int8_t dy = (int8_t)mx8650_read(dev, 0x04);
+            input_report_rel(dev, INPUT_REL_X, dx, false, K_FOREVER);
+            input_report_rel(dev, INPUT_REL_Y, dy, true, K_FOREVER);
+        }
+        k_msleep(10);
+    }
+}
+
+K_THREAD_STACK_DEFINE(mx8650_stack, 1024);
+struct k_thread mx8650_thread_data;
+
+static int mx8650_init(const struct device *dev) {
+    const struct mx8650_config *cfg = dev->config;
+    
+    printk("ZMK: MX8650 driver is loading...\n");
+
+    gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_ACTIVE); 
+    gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
+    
+    k_thread_create(&mx8650_thread_data, mx8650_stack, 1024,
+                    mx8650_thread, (void *)dev, NULL, NULL,
+                    K_PRIO_COOP(10), 0, K_NO_WAIT);
+    return 0;
+}
+
+static const struct mx8650_config mx8650_config_0 = {
+    .sclk = GPIO_DT_SPEC_GET(TRACKBALL_NODE, sclk_gpios),
+    .sdio = GPIO_DT_SPEC_GET(TRACKBALL_NODE, sdio_gpios),
+};
+
+DEVICE_DT_DEFINE(TRACKBALL_NODE, mx8650_init, NULL, NULL,
+                 &mx8650_config_0, POST_KERNEL, 90, NULL);
+
+#endif /* DT_NODE_EXISTS(TRACKBALL_NODE) */
