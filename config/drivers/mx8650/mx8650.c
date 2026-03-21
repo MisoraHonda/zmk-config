@@ -32,6 +32,8 @@ static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
         gpio_pin_set_dt(&cfg->sclk, 1);
         k_busy_wait(WAIT_TIME);
     }
+    // 書き込み後、線を休ませるためにプルアップ状態の入力に戻す
+    gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT | GPIO_PULL_UP);
 }
 
 static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
@@ -46,8 +48,11 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
         gpio_pin_set_dt(&cfg->sclk, 1);
         k_busy_wait(WAIT_TIME);
     }
-    gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
+    
+    // ▼ センサーがデータを返す前に、マイコン側を「入力＋内部プルアップ」に切り替える ▼
+    gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT | GPIO_PULL_UP);
     k_busy_wait(WAIT_TIME * 2);
+    
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         k_busy_wait(WAIT_TIME);
@@ -60,17 +65,18 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
 
 static void mx8650_thread(void *p1, void *p2, void *p3) {
     const struct device *dev = p1;
-    k_msleep(500); // 起動安定待ち
+    k_msleep(500); // 電源安定待ち
 
-    mx8650_write(dev, 0x06, 0x80); // Reset
-    k_msleep(20);
-    mx8650_write(dev, 0x06, 0x00); // 800 CPI
+    // ▼ 1. PIDを聞く前に、まずリセットコマンドでセンサーを叩き起こす ▼
+    mx8650_write(dev, 0x06, 0x80); 
+    k_msleep(50); // 起きるまで少し長めに待つ
+    mx8650_write(dev, 0x06, 0x00); // 800 CPI設定
     
     int loop_counter = 0;
 
     while (1) {
-        /* ▼ 1秒（10ms × 100回）に1回、強制的にログを出す ▼ */
         if (loop_counter % 100 == 0) {
+            // ▼ 2. 確実に起きているはずのセンサーにPIDを聞く ▼
             uint8_t pid1 = mx8650_read(dev, 0x00);
             uint8_t pid2 = mx8650_read(dev, 0x01);
             printk("=== MX8650 ALIVE === PID1: 0x%02x, PID2: 0x%02x\n", pid1, pid2);
@@ -95,7 +101,8 @@ static int mx8650_init(const struct device *dev) {
     const struct mx8650_config *cfg = dev->config;
     
     gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_ACTIVE); 
-    gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
+    gpio_pin_set_dt(&cfg->sclk, 1); // クロックの待機状態は確実にHighにする
+    gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT | GPIO_PULL_UP);
     
     k_thread_create(&mx8650_thread_data, mx8650_stack, 1024,
                     mx8650_thread, (void *)dev, NULL, NULL,
