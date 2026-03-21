@@ -5,7 +5,6 @@
 
 #define TRACKBALL_NODE DT_NODELABEL(trackball)
 
-/* ▼ここが重要：トラックボールが存在する側（右手）でのみ中身をコンパイルする▼ */
 #if DT_NODE_EXISTS(TRACKBALL_NODE)
 
 struct mx8650_config {
@@ -61,22 +60,23 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
 
 static void mx8650_thread(void *p1, void *p2, void *p3) {
     const struct device *dev = p1;
-    k_msleep(1000); // 起動安定待ち
-
-    /* センサーからIDを読み取ってログに出す */
-    uint8_t pid1 = mx8650_read(dev, 0x00);
-    uint8_t pid2 = mx8650_read(dev, 0x01);
-    
-    printk("\n\n###########################################\n");
-    printk("### MX8650 SENSOR DETECTED!             ###\n");
-    printk("### PID1: 0x%02x (Exp:0x30), PID2: 0x%02x ###\n", pid1, pid2);
-    printk("###########################################\n\n");
+    k_msleep(500); // 起動安定待ち
 
     mx8650_write(dev, 0x06, 0x80); // Reset
     k_msleep(20);
     mx8650_write(dev, 0x06, 0x00); // 800 CPI
     
+    int loop_counter = 0;
+
     while (1) {
+        /* ▼ 1秒（10ms × 100回）に1回、強制的にログを出す ▼ */
+        if (loop_counter % 100 == 0) {
+            uint8_t pid1 = mx8650_read(dev, 0x00);
+            uint8_t pid2 = mx8650_read(dev, 0x01);
+            printk("=== MX8650 ALIVE === PID1: 0x%02x, PID2: 0x%02x\n", pid1, pid2);
+        }
+        loop_counter++;
+
         uint8_t status = mx8650_read(dev, 0x02);
         if (status & 0x80) {
             int8_t dx = (int8_t)mx8650_read(dev, 0x03);
@@ -94,8 +94,6 @@ struct k_thread mx8650_thread_data;
 static int mx8650_init(const struct device *dev) {
     const struct mx8650_config *cfg = dev->config;
     
-    printk("ZMK: MX8650 driver is loading...\n");
-
     gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_ACTIVE); 
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
     
