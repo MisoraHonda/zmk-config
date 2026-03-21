@@ -1,3 +1,3 @@
 build:
-  kconfig: drivers/sensor/mx8650/Kconfig
-  cmake: drivers/sensor/mx8650
+  kconfig: drivers/mx8650/Kconfig
+  cmake: drivers/mx8650
