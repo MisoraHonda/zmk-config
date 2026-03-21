@@ -12,7 +12,6 @@ struct mx8650_config {
     struct gpio_dt_spec sdio;
 };
 
-/* 通信速度を安定させるためのディレイ（10us = 100kHz相当） */
 #define WAIT_TIME 10
 
 static void mx8650_write(const struct device *dev, uint8_t addr, uint8_t data) {
@@ -48,7 +47,7 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
         k_busy_wait(WAIT_TIME);
     }
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
-    k_busy_wait(WAIT_TIME * 2); // ターンアラウンド
+    k_busy_wait(WAIT_TIME * 2);
     for (int i = 7; i >= 0; i--) {
         gpio_pin_set_dt(&cfg->sclk, 0);
         k_busy_wait(WAIT_TIME);
@@ -61,19 +60,16 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
 
 static void mx8650_thread(void *p1, void *p2, void *p3) {
     const struct device *dev = p1;
-    
-    k_msleep(200); // 電源安定待ち
+    k_msleep(500);
 
-    /* ★デバッグログ：センサーのIDを読み取る */
+    // データシート記載の ID1=0x30, ID2=0x5x を確認 [cite: 150, 161, 165]
     uint8_t pid1 = mx8650_read(dev, 0x00);
     uint8_t pid2 = mx8650_read(dev, 0x01);
-    printk("MX8650 Status: PID1=0x%02x (Expected:0x02), PID2=0x%02x (Expected:0x51)\n", pid1, pid2);
+    printk("MX8650: PID1=0x%02x (Exp:0x30), PID2=0x%02x (Exp:0x5X)\n", pid1, pid2);
 
-    /* 初期化シーケンス */
-    mx8650_write(dev, 0x06, 0x80); // Soft Reset
+    mx8650_write(dev, 0x06, 0x80); // Reset
     k_msleep(20);
     mx8650_write(dev, 0x06, 0x00); // 800 CPI
-    
     while (1) {
         uint8_t status = mx8650_read(dev, 0x02);
         if (status & 0x80) {
@@ -91,10 +87,10 @@ struct k_thread mx8650_thread_data;
 
 static int mx8650_init(const struct device *dev) {
     const struct mx8650_config *cfg = dev->config;
-    /* SCLKはデータシート上、通常Highで待機 */
-    gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_ACTIVE); 
+    // 起動したことをログに出力
+    printk("MX8650: Driver init sequence started...\n");
+    gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_INACTIVE);
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
-    
     k_thread_create(&mx8650_thread_data, mx8650_stack, 1024,
                     mx8650_thread, (void *)dev, NULL, NULL,
                     K_PRIO_COOP(10), 0, K_NO_WAIT);
