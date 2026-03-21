@@ -22,8 +22,10 @@
     trackball: trackball {
         compatible = "pixart,mx8650";
         status = "okay";
-        sclk-gpios = <&gpio0 20 GPIO_ACTIVE_HIGH>;
-        sdio-gpios = <&gpio0 17 GPIO_ACTIVE_HIGH>;
+        /* 回路図 Pin 12 (D9 = P1.06) に修正 */
+        sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+        /* 回路図 Pin 11 (D8 = P1.04) に修正 */
+        sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
     };
 
     trackball_listener: trackball_listener {
