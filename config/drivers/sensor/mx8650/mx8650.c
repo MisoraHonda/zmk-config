@@ -60,11 +60,16 @@ static uint8_t mx8650_read(const struct device *dev, uint8_t addr) {
 
 static void mx8650_thread(void *p1, void *p2, void *p3) {
     const struct device *dev = p1;
-    k_msleep(500); 
+    k_msleep(1000); // 起動後に1秒待ってからログを出す
 
     uint8_t pid1 = mx8650_read(dev, 0x00);
     uint8_t pid2 = mx8650_read(dev, 0x01);
-    printk("MX8650 LOG: PID1=0x%02x (Exp:0x30), PID2=0x%02x\n", pid1, pid2);
+    
+    // WebSerialで絶対に見逃さないように派手に出します
+    printk("\n\n###########################################\n");
+    printk("### MX8650 SENSOR DETECTED!             ###\n");
+    printk("### PID1: 0x%02x, PID2: 0x%02x            ###\n", pid1, pid2);
+    printk("###########################################\n\n");
 
     mx8650_write(dev, 0x06, 0x80); // Reset
     k_msleep(20);
@@ -87,9 +92,13 @@ struct k_thread mx8650_thread_data;
 
 static int mx8650_init(const struct device *dev) {
     const struct mx8650_config *cfg = dev->config;
-    printk("MX8650: Initializing driver...\n");
+    
+    // ここが実行されれば、ビルドとロードは成功している証拠
+    printk("ZMK: MX8650 driver is loading...\n");
+
     gpio_pin_configure_dt(&cfg->sclk, GPIO_OUTPUT_ACTIVE); 
     gpio_pin_configure_dt(&cfg->sdio, GPIO_INPUT);
+    
     k_thread_create(&mx8650_thread_data, mx8650_stack, 1024,
                     mx8650_thread, (void *)dev, NULL, NULL,
                     K_PRIO_COOP(10), 0, K_NO_WAIT);
