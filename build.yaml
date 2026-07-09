@@ -8,20 +8,22 @@
 # board: [ "nice_nano" ]
 # shield: [ "corne_left", "corne_right" ]
 # include:
-#   - board: bdn9_rev2
-#   - board: nice_nano
-#     shield: reviung41
-#   - board: nice_nano
-#     shield: corne_left
-#     snippet: studio-rpc-usb-uart
-#     cmake-args: -DCONFIG_ZMK_STUDIO=y
-#     artifact-name: corne_left_with_studio
+#    - board: bdn9_rev2
+#    - board: nice_nano
+#      shield: reviung41
+#    - board: nice_nano
+#      shield: corne_left
+#      snippet: studio-rpc-usb-uart
+#      cmake-args: -DCONFIG_ZMK_STUDIO=y
+#      artifact-name: corne_left_with_studio
 #
 ---
 include:
-  - board: nice_nano//zmk
+  # ▼ 【右手：親機】新しく買ったBMP Boost用設定
+  - board: ble_micro_pro/zmk
     shield: clear_orange_right
-    # ↓ この一行を追加することで、右手が親機（パソコンと通信する側）になります
     cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
-  - board: nice_nano//zmk
+
+  # ▼ 【左手：子機】ひとまず手持ちのnice!nano用設定（最新ルール版）
+  - board: nice_nano/v2/zmk
     shield: clear_orange_left
