@@ -19,8 +19,11 @@
 #
 ---
 include:
-  - board: nice_nano/v2/zmk
+  # ▼ 【右手：親機】BMP Boost
+  - board: bmp_boost
     shield: clear_orange_right
     cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
-  - board: nice_nano/v2/zmk
+
+  # ▼ 【左手：子機】BMP Boost
+  - board: bmp_boost
     shield: clear_orange_left
