@@ -2,7 +2,6 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
-    # ▼ BMP Boostの公式開発者（sekigon-gonnoc氏）のリポジトリを追加
     - name: sekigon-gonnoc
       url-base: https://github.com/sekigon-gonnoc
   projects:
@@ -10,7 +9,6 @@ manifest:
       remote: zmkfirmware
       revision: main
       import: app/west.yml
-    # ▼ BMP Boost専用のZMK拡張モジュール（定義一式）を強制インポート
     - name: zmk-component-bmp-boost
       remote: sekigon-gonnoc
       revision: master
