@@ -1,45 +1,18 @@
 #include "clear_orange.dtsi"
 
-&kscan0 {
-    col-gpios
-        = <&gpio0 31 GPIO_ACTIVE_LOW>
-        , <&gpio0 29 GPIO_ACTIVE_LOW>
-        , <&gpio0 2  GPIO_ACTIVE_LOW>
-        , <&gpio1 15 GPIO_ACTIVE_LOW>
-        , <&gpio1 13 GPIO_ACTIVE_LOW>
-        , <&gpio1 11 GPIO_ACTIVE_LOW>
-        , <&gpio0 10 GPIO_ACTIVE_LOW>
-        ;
-};
-
 / {
-    /* USB CDC ACM (Virtual Serial Port) をログ出力用に選択 */
-    chosen {
-        zephyr,console = &cdc_acm_uart0;
-        zephyr,shell-uart = &cdc_acm_uart0;
-    };
-
     trackball: trackball {
         compatible = "pixart,mx8650";
         status = "okay";
-        /* 回路図 Pin 12 (D9 = P1.06) に修正 */
-        sclk-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
-        /* 回路図 Pin 11 (D8 = P1.04) に修正 */
-        sdio-gpios = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+        /* 回路図12ピン (SCLK_3.3V_mic) -> pro_micro 9 */
+        sclk-gpios = <&pro_micro 9 GPIO_ACTIVE_HIGH>;
+        /* 回路図11ピン (SDIO_3.3V_mic)  -> pro_micro 8 */
+        sdio-gpios = <&pro_micro 8 GPIO_ACTIVE_HIGH>;
     };
 
     trackball_listener: trackball_listener {
         compatible = "zmk,input-listener";
         device = <&trackball>;
-    };
-};
-
-/* nice!nano の USB コントローラー設定 */
-&zephyr_udc0 {
-    status = "okay";
-
-    cdc_acm_uart0: cdc_acm_uart0 {
-        compatible = "zephyr,cdc-acm-uart";
     };
 };
 
@@ -67,23 +40,23 @@
         compatible = "zmk,kscan-gpio-matrix";
         diode-direction = "col2row"; 
 
-        // Row側をプルアップして待ち受けます
+        // Row側（物理7〜10ピン）のマッピング
         row-gpios
-            = <&gpio0 22 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row0: 7ピン
-            , <&gpio0 24 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row1: 8ピン
-            , <&gpio1 0  (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row2: 9ピン
-            , <&gpio0 11 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row3: 10ピン
+            = <&pro_micro 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row0: 回路図7ピン (D4)
+            , <&pro_micro 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row1: 回路図8ピン (D5)
+            , <&pro_micro 6 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row2: 回路図9ピン (D6)
+            , <&pro_micro 7 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)> // Row3: 回路図10ピン (D7)
             ;
 
-        // Col側をスキャン信号として使用します
+        // Col側（物理14〜20ピン）のマッピング
         col-gpios
-            = <&gpio0 31 GPIO_ACTIVE_LOW> // Col0: 20ピン
-            , <&gpio0 29 GPIO_ACTIVE_LOW> // Col1: 19ピン
-            , <&gpio0 2  GPIO_ACTIVE_LOW> // Col2: 18ピン
-            , <&gpio1 15 GPIO_ACTIVE_LOW> // Col3: 17ピン
-            , <&gpio1 13 GPIO_ACTIVE_LOW> // Col4: 16ピン
-            , <&gpio1 11 GPIO_ACTIVE_LOW> // Col5: 15ピン
-            , <&gpio0 10 GPIO_ACTIVE_LOW> // Col6: 14ピン
+            = <&pro_micro 21 GPIO_ACTIVE_LOW> // Col0: 回路図20ピン (A3)
+            , <&pro_micro 20 GPIO_ACTIVE_LOW> // Col1: 回路図19ピン (A2)
+            , <&pro_micro 19 GPIO_ACTIVE_LOW> // Col2: 回路図18ピン (A1)
+            , <&pro_micro 18 GPIO_ACTIVE_LOW> // Col3: 回路図17ピン (A0)
+            , <&pro_micro 15 GPIO_ACTIVE_LOW> // Col4: 回路図16ピン (D15)
+            , <&pro_micro 14 GPIO_ACTIVE_LOW> // Col5: 回路図15ピン (D14)
+            , <&pro_micro 16 GPIO_ACTIVE_LOW> // Col6: 回路図14ピン (D16)
             ;
     };
 };
