@@ -7,10 +7,14 @@ manifest:
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: main        # ★最新版に戻して行方不明のファイルを復活
+      revision: main
       import: app/west.yml
     - name: zmk-component-bmp-boost
       remote: sekigon-gonnoc
       revision: master
+    # ▼ 【重要】ログで怒られていた未定義エラーを消し去るための必須パーツを追加
+    - name: zmk-feature-non-lipo-battery-management
+      remote: sekigon-gonnoc
+      revision: main
   self:
     path: config
