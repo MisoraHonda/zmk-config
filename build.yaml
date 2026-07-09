@@ -19,11 +19,11 @@
 #
 ---
 include:
-  # ▼ 【右手：親機】新しく買ったBMP Boost用設定
-  - board: ble_micro_pro/zmk
+  # ▼ 【右手：親機】/zmk を削ってシンプルな名前に修正
+  - board: ble_micro_pro
     shield: clear_orange_right
     cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y
 
-  # ▼ 【左手：子機】ひとまず手持ちのnice!nano用設定（最新ルール版）
+  # ▼ 【左手：子機】ひとまず手持ちのnice!nano用設定
   - board: nice_nano/v2/zmk
     shield: clear_orange_left
