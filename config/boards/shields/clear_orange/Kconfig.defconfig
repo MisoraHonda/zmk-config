@@ -14,4 +14,9 @@ if SHIELD_CLEAR_ORANGE_LEFT || SHIELD_CLEAR_ORANGE_RIGHT
 config ZMK_SPLIT
     default y
 
+# ▼ 左右共通のブロックの末尾に、この2行を追記します
+config ZMK_BOARD_COMPAT
+    bool
+    default y
+
 endif
