@@ -22,10 +22,10 @@ include:
   # ▼ 【右手：親機】
   - board: bmp_boost
     shield: clear_orange_right
-    # ↓ 末尾に -DXCONFIG_WARN_AS_ERROR=OFF を追加して、システムの一方的な強制終了を阻止します
-    cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y -DXCONFIG_WARN_AS_ERROR=OFF
+    # ↓ -DKCONFIG_WARN_AS_ERROR=OFF に正しく修正（余計なXを消去）
+    cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y -DKCONFIG_WARN_AS_ERROR=OFF
 
   # ▼ 【左手：子機】
   - board: bmp_boost
     shield: clear_orange_left
-    cmake-args: -DXCONFIG_WARN_AS_ERROR=OFF
+    cmake-args: -DKCONFIG_WARN_AS_ERROR=OFF
