@@ -22,7 +22,6 @@
         zmk,matrix-transform = &default_transform;
     };
 
-    /* 左右14列分のマス目（RC(0,0)〜RC(3,13)）を完全定義 */
     default_transform: keymap_transform {
         compatible = "zmk,matrix-transform";
         columns = <14>;
@@ -47,7 +46,7 @@
             , <&pro_micro 7 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
             ;
 
-        /* 回路図（BMP Boost/Pro Micro）に対応する正しいCol0〜Col6の割り当て */
+        /* 回路図(Col0〜Col6)に対応する正確なピン定義 */
         col-gpios
             = <&pro_micro 21 GPIO_ACTIVE_LOW>
             , <&pro_micro 20 GPIO_ACTIVE_LOW>
