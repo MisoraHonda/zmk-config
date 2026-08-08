@@ -46,14 +46,15 @@
             , <&pro_micro 7 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
             ;
 
+        /* 21を末尾に移動して1列分のズレを正方向へ補正 */
         col-gpios
-            = <&pro_micro 16 GPIO_ACTIVE_LOW>
-            , <&pro_micro 21 GPIO_ACTIVE_LOW>
-            , <&pro_micro 20 GPIO_ACTIVE_LOW>
+            = <&pro_micro 20 GPIO_ACTIVE_LOW>
             , <&pro_micro 19 GPIO_ACTIVE_LOW>
             , <&pro_micro 18 GPIO_ACTIVE_LOW>
             , <&pro_micro 15 GPIO_ACTIVE_LOW>
             , <&pro_micro 14 GPIO_ACTIVE_LOW>
+            , <&pro_micro 16 GPIO_ACTIVE_LOW>
+            , <&pro_micro 21 GPIO_ACTIVE_LOW>
             ;
     };
 };
