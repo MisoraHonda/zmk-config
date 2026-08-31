@@ -19,7 +19,7 @@
 #
 ---
 include:
-  # ▼ 【右手：親機】
+  # ▼ 【右手：親機（トラックボール使用）】
   - board: bmp_boost
     shield: clear_orange_right
     cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y -DKCONFIG_WARN_AS_ERROR=OFF
@@ -28,3 +28,7 @@ include:
   - board: bmp_boost
     shield: clear_orange_left
     cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n -DKCONFIG_WARN_AS_ERROR=OFF
+
+  # ▼ 【ペアリング記憶リセット用】
+  - board: bmp_boost
+    shield: settings_reset
