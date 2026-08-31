@@ -1,22 +1,16 @@
 if SHIELD_CLEAR_ORANGE_LEFT
 
-# Name must be less than 16 characters long!
 config ZMK_KEYBOARD_NAME
-    default "clear_orange"
-
-config ZMK_SPLIT_ROLE_CENTRAL
-    default y
+    default "clearorange"
 
 endif
 
-if SHIELD_CLEAR_ORANGE_LEFT || SHIELD_CLEAR_ORANGE_RIGHT
+if SHIELD_CLEAR_ORANGE_RIGHT
 
-config ZMK_SPLIT
-    default y
+config ZMK_KEYBOARD_NAME
+    default "clearorange"
 
-# ▼ 左右共通のブロックの末尾に、この2行を追記します
-config ZMK_BOARD_COMPAT
-    bool
+config ZMK_SPLIT_ROLE_CENTRAL
     default y
 
 endif
