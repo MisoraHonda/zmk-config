@@ -15,9 +15,5 @@ config ZMK_SPLIT_ROLE_CENTRAL
 
 endif
 
-if SHIELD_CLEAR_ORANGE_LEFT || SHIELD_CLEAR_ORANGE_RIGHT
-
 config ZMK_BOARD_COMPAT
     def_bool y
-
-endif
