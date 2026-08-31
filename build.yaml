@@ -19,6 +19,10 @@
 #
 ---
 include:
+  # ▼ 【リセット用ファームウェア】
+  - board: bmp_boost
+    shield: settings_reset
+
   # ▼ 【右手：親機】
   - board: bmp_boost
     shield: clear_orange_right
