@@ -22,6 +22,7 @@ include:
   # ▼ 【リセット用ファームウェア】
   - board: bmp_boost
     shield: settings_reset
+    cmake-args: -DCONFIG_ZMK_BOARD_COMPAT=y -DKCONFIG_WARN_AS_ERROR=OFF
 
   # ▼ 【右手：親機】
   - board: bmp_boost
