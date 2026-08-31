@@ -3,15 +3,15 @@ if SHIELD_CLEAR_ORANGE_LEFT
 config ZMK_KEYBOARD_NAME
     default "clearorange"
 
+config ZMK_SPLIT_ROLE_CENTRAL
+    default y
+
 endif
 
 if SHIELD_CLEAR_ORANGE_RIGHT
 
 config ZMK_KEYBOARD_NAME
     default "clearorange"
-
-config ZMK_SPLIT_ROLE_CENTRAL
-    default y
 
 endif
 
