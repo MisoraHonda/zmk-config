@@ -22,8 +22,7 @@ include:
   # ▼ 【右手：親機】
   - board: bmp_boost
     shield: clear_orange_right
-    # ↓ -DKCONFIG_WARN_AS_ERROR=OFF に正しく修正（余計なXを消去）
-    cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=y -DKCONFIG_WARN_AS_ERROR=OFF
+    cmake-args: -DCONFIG_ZMK_SPLIT_BLE_ROLE_CENTRAL=y -DKCONFIG_WARN_AS_ERROR=OFF
 
   # ▼ 【左手：子機】
   - board: bmp_boost
