@@ -19,11 +19,6 @@
 #
 ---
 include:
-  # ▼ 【リセット用ファームウェア】
-  - board: bmp_boost
-    shield: settings_reset
-    cmake-args: -DKCONFIG_WARN_AS_ERROR=OFF
-
   # ▼ 【右手：親機】
   - board: bmp_boost
     shield: clear_orange_right
@@ -32,4 +27,4 @@ include:
   # ▼ 【左手：子機】
   - board: bmp_boost
     shield: clear_orange_left
-    cmake-args: -DKCONFIG_WARN_AS_ERROR=OFF
+    cmake-args: -DCONFIG_ZMK_SPLIT_ROLE_CENTRAL=n -DKCONFIG_WARN_AS_ERROR=OFF
