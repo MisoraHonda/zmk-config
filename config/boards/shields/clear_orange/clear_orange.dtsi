@@ -43,8 +43,5 @@
             ;
     };
 
-    sensors: sensors {
-        compatible = "zmk,keymap-sensors";
-        status = "okay";
-    };
+    
 };
