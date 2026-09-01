@@ -6,7 +6,6 @@
     chosen {
         zmk,kscan = &kscan0;
         zmk,matrix-transform = &default_transform;
-        zmk,sensors = &sensors;
     };
 
     default_transform: keymap_transform {
@@ -41,18 +40,5 @@
             , <&pro_micro 14 GPIO_ACTIVE_LOW>
             , <&pro_micro 16 GPIO_ACTIVE_LOW>
             ;
-    };
-
-    left_encoder: encoder_left {
-        compatible = "alps,ec11";
-        a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        b-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <80>;
-    };
-
-    sensors: sensors {
-        compatible = "zmk,keymap-sensors";
-        sensors = <&left_encoder>;
-        triggers-per-rotation = <20>;
     };
 };
