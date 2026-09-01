@@ -42,4 +42,9 @@
             , <&gpio0 10 GPIO_ACTIVE_LOW> // Col6: 14ピン
             ;
     };
+
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        status = "okay";
+    };
 };
