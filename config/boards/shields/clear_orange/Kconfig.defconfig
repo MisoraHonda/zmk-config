@@ -1,7 +1,10 @@
+config ZMK_BOARD_COMPAT
+    def_bool y
+
 if SHIELD_CLEAR_ORANGE_RIGHT
 
 config ZMK_KEYBOARD_NAME
-    default "Clear_orange"
+    default "clearorange R"
 
 config ZMK_SPLIT
     default y
@@ -17,7 +20,7 @@ endif
 if SHIELD_CLEAR_ORANGE_LEFT
 
 config ZMK_KEYBOARD_NAME
-    default "clearorange"
+    default "clearorange L"
 
 config ZMK_SPLIT
     default y
