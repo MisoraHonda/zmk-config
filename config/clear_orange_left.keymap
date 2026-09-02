@@ -1,4 +1,4 @@
-#include "clear_orange.dtsi"
+#include "boards/shields/clear_orange/clear_orange.dtsi"
 
 #include <dt-bindings/zmk/matrix_transform.h>
 #include <behaviors.dtsi>
